@@ -1,3 +1,9 @@
+解决：用pd.concat([df1,df2],axis=1,join='inner'),取并集代替merge
+
+
+
+
+
 import os
 import pandas as pd
 import csv
