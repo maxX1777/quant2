@@ -1,0 +1,26 @@
+import os
+import pandas as pd
+import csv
+import codecs
+from io import StringIO
+import numpy as np
+
+
+os.chdir('D:/Document')
+stock = pd.read_csv('TRD_Index.csv',index_col = 'Trddt')
+close = stock.Clsindex
+
+close.index = pd.to_datetime(close.index)
+close.index.name = 'Datetime'
+print(close.head())
+
+lagclose = close.shift(1)
+Calclose = pd.DataFrame({'close':close,
+                         'lagclose':lagclose})
+print(Calclose.head(20))
+simpleret = (close-lagclose)/lagclose
+simpleret.name = 'Simpleret'
+print(simpleret.head())
+print(type(simpleret))
+calret = pd.merge(pd.DataFrame(simpleret),Calclose,left_index=True,right_index=True)
+print(calret.head())
