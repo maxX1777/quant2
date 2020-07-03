@@ -6,27 +6,40 @@
 
 import os
 import pandas as pd
+import ffn
 import csv
 import codecs
 from io import StringIO
 import numpy as np
 
-
 os.chdir('D:/Document')
-stock = pd.read_csv('TRD_Index.csv',index_col = 'Trddt')
+stock = pd.read_csv('TRD_Index.csv', index_col='Trddt')
 close = stock.Clsindex
 
 close.index = pd.to_datetime(close.index)
-close.index.name = 'Datetime'
+close.index.name = 'Date'
 print(close.head())
 
 lagclose = close.shift(1)
-Calclose = pd.DataFrame({'close':close,
-                         'lagclose':lagclose})
-print(Calclose.head(20))
-simpleret = (close-lagclose)/lagclose
+lagclose.name = 'data'
+print(lagclose.head())
+Calclose = pd.DataFrame({'close': close,
+                         'lagclose': lagclose})
+print(Calclose.head())
+simpleret = (close - lagclose) / lagclose
 simpleret.name = 'Simpleret'
 print(simpleret.head())
-print(type(simpleret))
-calret = pd.merge(pd.DataFrame(simpleret),Calclose,left_index=True,right_index=True)
-print(calret.head())
+#print(type(simpleret))
+dfsim = pd.DataFrame(simpleret)
+print(type(dfsim))
+print(type(Calclose))
+#calret = pd.merge(Calclose, dfsim, left_index=True, right_index = True)
+calret = pd.concat([Calclose,dfsim],axis=1,join='inner')
+#print(calret.head(10))
+
+simpleret2 = (close-close.shift(2))/close.shift(2)
+simpleret2.name = 'Simpleret2'
+dfsim2 = pd.DataFrame(simpleret2)
+calret2 = pd.concat([calret,dfsim2],axis=1,join='inner')
+print(calret2.head())
+print(calret2.iloc[5,:])
