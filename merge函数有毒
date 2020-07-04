@@ -47,3 +47,6 @@ print(calret2.iloc[5,:])
 
 annualize = (1+simpleret).cumprod()[-1]**(245/311)-1
 print(annualize)#计算年化率
+
+((1+simpleret).cumprod()-1).plot()
+plt.show()
