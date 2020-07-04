@@ -43,3 +43,7 @@ dfsim2 = pd.DataFrame(simpleret2)
 calret2 = pd.concat([calret,dfsim2],axis=1,join='inner')
 print(calret2.head())
 print(calret2.iloc[5,:])
+
+
+annualize = (1+simpleret).cumprod()[-1]**(245/311)-1
+print(annualize)#计算年化率
