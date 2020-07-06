@@ -1,0 +1,23 @@
+import os
+import pandas as pd
+import ffn
+import csv
+import codecs
+from io import StringIO
+import numpy as np
+import matplotlib; matplotlib.use('TKAgg')
+import matplotlib.pyplot as plt
+from statsmodels.tsa import stattools
+from statsmodels.graphics.tsaplots import *
+
+os.chdir('D:/Document')
+data = pd.read_table('TRD_Index.txt',sep = '\t',index_col = 'Trddt')
+#print(data.head())
+SHindex = data[data.Indexcd == 1]
+SHindex.index = pd.to_datetime(SHindex.index)
+SHRet = SHindex.Retindex
+print(SHRet.head())
+acfs = stattools.acf(SHRet)
+print(acfs[:5])
+plot_acf(SHRet,use_vlines=True,lags = 30)
+plt.show()
