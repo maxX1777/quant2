@@ -1,0 +1,40 @@
+import os
+import pandas as pd
+import ffn
+import csv
+import codecs
+from io import StringIO
+import numpy as np
+import matplotlib; matplotlib.use('TKAgg')
+import matplotlib.pyplot as plt
+
+os.chdir('D:/Document')
+indexcd = pd.read_excel("test123.xlsx",index_col= 'Trddt')
+mktcd = indexcd[indexcd.Indexcd == 2]
+#print(mktcd.head())
+
+#print(indexcd.head())
+#print(type(indexcd))
+mktret = pd.Series(mktcd.Retindex,index=pd.to_datetime(mktcd.index))
+mktret.name = 'mktret'
+print(type(mktret))
+print(mktret.head())
+xinan = indexcd[indexcd.Indexcd == 1]
+#print(xinan.head())
+xinan_ret = (xinan.Clsindex-xinan.Clsindex.shift(1))/xinan.Clsindex.shift(1)
+xinan_ret.name = 'returns'
+print(type(xinan_ret))
+print(xinan_ret.head())
+
+
+Ret = pd.concat([mktret,xinan_ret],axis=1,join='inner')
+print(Ret.head())
+#print(type(Ret))
+rf = 1.036**(1/360)-1
+#print(rf)
+Eret = Ret -rf
+print(Eret.head())
+
+plt.scatter(Eret.values[:,0],Eret.values[:,1])
+plt.title('test123')
+plt.show()
