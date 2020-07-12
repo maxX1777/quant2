@@ -33,3 +33,9 @@ args={'a':1,'b':2}
 func(**args)
 
 等价于函数调用 func(a=1,b=2)
+
+
+
+
+
+dropna()删除缺失值
