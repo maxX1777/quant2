@@ -1,3 +1,5 @@
+#用最新的mplfinance画K线图
+
 import os
 import pandas as pd
 import ffn
@@ -11,28 +13,30 @@ from matplotlib.dates import DateFormatter,WeekdayLocator,DayLocator,MONDAY,date
 from statsmodels.tsa import stattools
 from statsmodels.graphics.tsaplots import *
 from datetime import datetime
-from mpl_finance import candlestick_ohlc
+import mplfinance as mpf
 
 
 os.chdir('D:/Document')
-data = pd.read_csv('problem27-1.csv')
-#print(data.head())
-data.date = [date2num(datetime.strptime(date,"%Y-%m-%d"))for date in data.date]
-print(type(data.date))
-data_list = list()
-for i in range(len(data)):
-    data_list.append(data.iloc[i,:])
-ax = plt.subplot(
+jiaotongbank = pd.read_csv('problem29-2.csv')
+jiaotongbank.index = jiaotongbank.iloc[:,6]
+jiaotongbank.index = pd.to_datetime(jiaotongbank.index, format='%Y-%m-%d')
+jiaotongbank = jiaotongbank.iloc[:,0:5]
+#print(jiaotongbank.shape)
 
+mc = mpf.make_marketcolors(
+    up='red',
+    down='green',
+    edge='i',
+    wick='i',
+    volume='in',
+    inherit=True
 )
-mondays = WeekdayLocator(MONDAY)
-weekFormatter = DateFormatter('%y %b %d')
-ax.xaxis.set_major_locator(mondays)
-ax.xaxis.set_minor_locator(DayLocator() )
-ax.xaxis.set_major_formatter(weekFormatter)
-plt.rcParams['font.sans-serif'] = ['SimHei']
-plt.rcParams['axes.unicode_minus'] = False
-ax.set_title('test111')
-candlestick_ohlc(ax,data,width=0.7,colorup='r',colordown='g')
-plt.setp(plt.gca().get_xticklabels(),rotation = 50, horizontalalignment = 'center')
-plt.show()
+s = mpf.make_mpf_style(
+    gridaxis='both',
+    gridstyle='-.',
+    y_on_right=False,
+    marketcolors=mc)
+
+
+mpf.plot(jiaotongbank, type = 'candle', style=s)
+
