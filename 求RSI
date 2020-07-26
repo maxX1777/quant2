@@ -1,0 +1,71 @@
+import pandas as pd
+import numpy as np
+import matplotlib; matplotlib.use('TKAgg')
+import matplotlib.pyplot as plt
+import os
+from pandas.plotting import register_matplotlib_converters
+register_matplotlib_converters()
+os.chdir('D:/Document')
+
+
+BOCM = pd.read_csv('problem29-1.csv')
+BOCM.index = BOCM.iloc[:,6]
+BOCM.index = pd.to_datetime(BOCM.index, format='%Y-%m-%d')
+BOCM=BOCM.iloc[:,0:6]
+#print(BOCM.head())
+BOCMClp = BOCM.Close
+#print(BOCMClp.shift(1).head())
+clprice_delta = BOCMClp-BOCMClp.shift(1)
+clprice_delta = clprice_delta.dropna()
+
+#print(clprice_delta.head())
+indexprc = clprice_delta.index
+#print(len(indexprc))
+upprc = pd.Series(0, index = indexprc)
+downprc = pd.Series(0, index=indexprc)
+upprc[clprice_delta > 0] = clprice_delta[clprice_delta > 0]
+downprc[clprice_delta < 0] = -clprice_delta[clprice_delta < 0]
+rsidata = pd.concat([BOCMClp, clprice_delta, upprc, downprc],axis=1,join='inner')
+rsidata.columns = ['Close','PrcChange','upprc','downprc']
+rsidata = rsidata.dropna()
+#print(rsidata.head(10))
+SMup = []
+SMdown = []
+rsi_final = []
+for i in range(6,len(upprc)+1):
+    SMup.append(np.mean(upprc.values[(i-6):i],dtype=np.float32))
+    SMdown.append(np.mean(downprc.values[(i - 6):i], dtype=np.float32))
+for i in range(0,len(SMup)):
+    rsi6 = 100 * SMup[i] / (SMup[i] + SMdown[i])
+    rsi_final.append(rsi6)
+#print(rsi_final)
+indexRsi = indexprc[5:]
+rsi_final = pd.Series(rsi_final,index=indexRsi)
+UP = pd.Series(SMup,index = indexRsi)
+DOWN = pd.Series(SMdown, index = indexRsi)
+print(type(rsi_final))
+print(type(UP))
+print(type(DOWN))
+
+plt.rcParams['font.sans-serif'] = ['SimHei']
+plt.subplot(411)
+plt.plot(BOCMClp,'k')
+plt.xlabel('date')
+plt.ylabel('Close')
+plt.title('RSI指标')
+plt.subplot(412)
+plt.plot(UP,'olive')
+plt.ylabel('UP')
+
+plt.subplot(413)
+plt.plot(DOWN,'aqua')
+plt.ylabel('DOWN')
+
+plt.subplot(414)
+plt.plot(rsi_final,'g')
+plt.ylabel('Rsi6')
+
+plt.show()
+
+print(len(SMdown))
+#print(rsi_final.describe())
