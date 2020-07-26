@@ -4,3 +4,6 @@ import os
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 os.chdir('D:/Document')
+
+
+plt.legend()#显示标签展示每条线代表什么
