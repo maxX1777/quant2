@@ -1,0 +1,66 @@
+#三种移动平均的比较
+import pandas as pd
+import numpy as np
+import matplotlib; matplotlib.use('TKAgg')
+import matplotlib.pyplot as plt
+import os
+from pandas.plotting import register_matplotlib_converters
+register_matplotlib_converters()
+os.chdir('D:/Document')
+import mplfinance as mpf
+from test import Moving_average_calculation
+from test import Weighted_average_moving_culculation
+from test import ewmaCal
+
+q30_1 = pd.read_csv('problem30-1.csv')
+q30_1.index = q30_1.iloc[:,6]
+q30_1.index = pd.to_datetime(q30_1.index, format='%Y-%m-%d')
+q30_1 = q30_1.iloc[:, 0:6]
+#print(q30_1.index)
+DJI_close = q30_1.Close
+close14 = DJI_close['2014']
+
+
+#print(close14)
+Sma10 = Moving_average_calculation(close14, 10)
+#print(Sma10.head(10))
+
+weight = np.array(range(1,11))/sum(range(1,11))
+Wma10 = Weighted_average_moving_culculation(close14, weight)
+
+expo = 2/(len(close14)+1)
+Ema10 = ewmaCal(close14,10,expo)
+
+plt.rcParams['font.sans-serif'] = ['SimHei']
+# plt.plot(close14, label='close', color='k')
+# plt.plot(Sma10, label='简单', color='deepskyblue')
+# plt.plot(Wma10, label='加权', color='wheat')
+# plt.plot(Ema10, label='指数加权', color='seagreen')
+# plt.title("中国银行价格均线")
+# plt.legend()
+# plt.ylim(15000,)
+# plt.show()
+
+signal = pd.Series(0, index=close14.index)
+for i in range(10,len(close14)):
+    if all([close14[i] > Ema10[i], close14[i-1] < Ema10[i-1]]):
+        signal[i] = 1
+    elif all([close14[i] < Ema10[i], close14[i-1] > Ema10[i-1]]):
+        signal[i] = -1
+buysignal = signal[signal == 1]
+#print(buysignal)
+sellsignal = signal[signal == -1]
+#print(sellsignal)
+CBret = close14/close14.shift(1)-1
+EwmaRet = (CBret*signal).dropna()
+print(CBret)
+print(EwmaRet)
+cumStock = np.cumprod(1+CBret[EwmaRet.index[0]:])-1
+cumTrade = np.cumprod(1+EwmaRet)-1
+cumdata = pd.DataFrame({'cumTrade': cumTrade,
+                        'cumStock': cumStock})
+#print(cumdata)
+plt.plot(cumStock, label="cumStock", color='k')
+plt.plot(cumTrade, label="cumTrade", color='orange')
+plt.legend()
+plt.show()
