@@ -1,0 +1,27 @@
+import pandas as pd
+import numpy as np
+import mplfinance as mpf
+
+from test import Moving_average_calculation
+import matplotlib; matplotlib.use('TKAgg')
+import matplotlib.pyplot as plt
+import os
+from pandas.plotting import register_matplotlib_converters
+register_matplotlib_converters()
+os.chdir('D:/Document')
+
+q30_1 = pd.read_csv('problem30-1.csv')
+q30_1.index = q30_1.iloc[:,6]
+q30_1.index = pd.to_datetime(q30_1.index, format='%Y-%m-%d')
+q30_1 = q30_1.iloc[:, 0:6]
+#print(q30_1.index)
+DJI_close = q30_1.Close
+
+Sma = Moving_average_calculation(DJI_close, 5)
+plt.rcParams['font.sans-serif'] = ['SimHei']
+plt.rcParams['axes.unicode_minus']=False #用来正常显示负号
+plt.plot(Sma, color='k')
+plt.ylim(10000,)
+# plt.show()
+mpf.plot(q30_1,type='ohlc',mav=5)
+plt.show()
